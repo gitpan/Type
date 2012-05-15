@@ -1,6 +1,6 @@
 package Type::Constraint::AnyIsa;
 {
-  $Type::Constraint::AnyIsa::VERSION = '0.01'; # TRIAL
+  $Type::Constraint::AnyIsa::VERSION = '0.02'; # TRIAL
 }
 
 use strict;
@@ -36,15 +36,85 @@ my $_inline_generator = sub {
         . B::perlstring( $self->class ) . ')';
 };
 
-has '+inline_generator' => (
+has '+_inline_generator' => (
     init_arg => undef,
     default  => sub { $_inline_generator },
 );
 
-has '+message_generator' => (
+has '+_message_generator' => (
     default => sub { $_[0]->_default_message_generator() },
 );
 
 __PACKAGE__->meta()->make_immutable();
 
 1;
+
+# ABSTRACT: A class for constraints which require a class name or an object that inherit from a specific class
+
+
+
+=pod
+
+=head1 NAME
+
+Type::Constraint::AnyIsa - A class for constraints which require a class name or an object that inherit from a specific class
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+  my $type = Type::Constraint::AnyIsa->new(...);
+  print $type->class();
+
+=head1 DESCRIPTION
+
+This is a specialized type constraint class for types which require a class
+name or an object that inherit from a specific class.
+
+=head1 API
+
+This class provides all of the same methods as L<Type::Constraint::Simple>,
+with a few differences:
+
+=head2 Type::Constraint::AnyIsa->new( ... )
+
+The C<parent> parameter is ignored if it passed, as it is always set to the
+C<Defined> type.
+
+The C<inline_generator> and C<constraint> parameters are also ignored. This
+class provides its own default inline generator subroutine reference.
+
+This class overrides the C<message_generator> default if none is provided.
+
+Finally, this class requires an additional parameter, C<class>. This must be a
+single class name.
+
+=head2 $any_isa->class()
+
+Returns the class name passed to the constructor.
+
+=head1 ROLES
+
+This class does the L<Type::Constraint::Role::IsaType>,
+L<Type::Constraint::Role::Interface>, L<Type::Role::Inlinable>, and
+L<MooseX::Clone> roles.
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Dave Rolsky.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
+
+
+__END__
+

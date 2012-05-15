@@ -1,6 +1,6 @@
 package Type::Constraint::Role::Interface;
 {
-  $Type::Constraint::Role::Interface::VERSION = '0.01'; # TRIAL
+  $Type::Constraint::Role::Interface::VERSION = '0.02'; # TRIAL
 }
 
 use strict;
@@ -14,7 +14,6 @@ use Try::Tiny;
 use Type::Exception;
 
 use Moose::Role;
-use MooseX::Aliases;
 
 with 'MooseX::Clone', 'Type::Role::Inlinable';
 
@@ -30,12 +29,12 @@ has parent => (
     predicate => '_has_parent',
 );
 
-has constraint => (
+has _constraint => (
     is        => 'rw',
     writer    => '_set_constraint',
     isa       => 'CodeRef',
     predicate => '_has_constraint',
-    alias     => 'where',
+    init_arg  => 'constraint',
 );
 
 has _optimized_constraint => (
@@ -66,11 +65,11 @@ my $_default_message_generator = sub {
         . Devel::PartialDump->new()->dump($value);
 };
 
-has message_generator => (
-    is      => 'ro',
-    isa     => 'CodeRef',
-    default => sub { $_default_message_generator },
-    alias   => 'message',
+has _message_generator => (
+    is       => 'ro',
+    isa      => 'CodeRef',
+    default  => sub { $_default_message_generator },
+    init_arg => 'message_generator',
 );
 
 has _coercions => (
@@ -86,6 +85,18 @@ has _coercions => (
 );
 
 my $NullConstraint = sub { 1 };
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+
+    my $p = $class->$orig(@_);
+
+    $p->{constraint}        = delete $p->{where}   if exists $p->{where};
+    $p->{message_generator} = delete $p->{message} if exists $p->{message};
+
+    return $p;
+};
 
 sub BUILD { }
 
@@ -111,7 +122,7 @@ sub validate_or_die {
     return if $self->value_is_valid($value);
 
     Type::Exception->throw(
-        message => $self->message_generator()
+        message => $self->_message_generator()
             ->( $self, $self->_description(), $value ),
         type  => $self,
         value => $value,
@@ -141,7 +152,7 @@ sub has_real_constraint {
     my $self = shift;
 
     return (   $self->_has_constraint
-            && $self->constraint() ne $NullConstraint )
+            && $self->_constraint() ne $NullConstraint )
         || $self->_has_inline_generator();
 }
 
@@ -150,7 +161,7 @@ sub inline_check {
 
     die 'Cannot inline' unless $self->_has_inline_generator();
 
-    return $self->inline_generator()->( $self, @_ );
+    return $self->_inline_generator()->( $self, @_ );
 }
 
 sub _build_optimized_constraint {
@@ -178,7 +189,7 @@ sub _constraint_with_parents {
             @constraints = $type->_generated_inline_sub();
         }
         else {
-            push @constraints, $type->constraint();
+            push @constraints, $type->_constraint();
         }
     }
 
@@ -247,12 +258,23 @@ sub inline_coercion_and_check {
     die 'Cannot inline coercion and check'
         unless $self->can_inline_coercion_and_check();
 
+    my %env = (
+        '$_Type_Constraint_Interface_type' => \$self,
+        '$_Type_Constraint_Interface_message_generator' =>
+            \( $self->_message_generator() ),
+        '$_Type_Constraint_Interface_description' =>
+            \( $self->_description() ),
+        %{ $self->_inline_environment() },
+    );
+
     my $source = 'do {' . 'my $value = ' . $_[0] . ';';
     for my $coercion ( $self->coercions() ) {
         $source
             .= '$value = '
             . $coercion->inline_coercion( $_[0] ) . ' if '
             . $coercion->from()->inline_check( $_[0] ) . ';';
+
+        %env = ( %env, %{ $coercion->_inline_environment() } );
     }
 
     #<<<
@@ -266,16 +288,7 @@ sub inline_coercion_and_check {
     #>>>
     $source .= '$value };';
 
-    return (
-        $source,
-        {
-            '$_Type_Constraint_Interface_type' => \$self,
-            '$_Type_Constraint_Interface_message_generator' =>
-                \( $self->message_generator() ),
-            '$_Type_Constraint_Interface_description' =>
-                \( $self->_description() ),
-        }
-    );
+    return ( $source, \%env );
 }
 
 sub _build_ancestors {
@@ -291,15 +304,65 @@ sub _build_ancestors {
     return \@parents;
 
 }
+
 sub _build_description {
     my $self = shift;
 
     my $desc
         = $self->is_anon() ? 'anonymous type' : 'type named ' . $self->name();
 
-    $desc .= q{ } . $self->_declaration_description();
+    $desc .= q{ } . $self->declared_at()->description();
 
     return $desc;
 }
 
 1;
+
+# ABSTRACT: The interface all type constraints should provide
+
+
+
+=pod
+
+=head1 NAME
+
+Type::Constraint::Role::Interface - The interface all type constraints should provide
+
+=head1 VERSION
+
+version 0.02
+
+=head1 DESCRIPTION
+
+This role defines the interface that all type constraints must provide, and
+provides most (or all) of the implementation. The L<Type::Constraint::Simple>
+class simply consumes this role and provides no additional code. Other
+constraint classes add features or override some of this role's functionality.
+
+=head1 API
+
+See the L<Type::Constraint::Simple> documentation for details. See the
+internals of various constraint classes to see how this role can be overridden
+or expanded upon.
+
+=head1 ROLES
+
+This role does the L<Type::Role::Inlinable> and L<MooseX::Clone> roles.
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Dave Rolsky.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
+
+
+__END__
+

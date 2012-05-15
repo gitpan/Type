@@ -34,9 +34,14 @@ PARAMETERIZABLE
 PayPal
 Rolsky
 ScalarRef
+Throwable
 boolification
+distro
 globification
+inlinable
 inline
 isa
 parameterizable
+parameterization
 parameterized
+sigils

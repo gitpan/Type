@@ -9,8 +9,10 @@ my %module_build_args = (
   "build_requires" => {
     "IO::File" => 0,
     "Module::Build" => "0.3601",
+    "Pod::Coverage::Moose" => 0,
     "Test::Fatal" => 0,
     "Test::More" => "0.88",
+    "Test::Pod::Coverage" => 0,
     "Test::Spelling" => 0,
     "encoding" => 0
   },
@@ -23,7 +25,7 @@ my %module_build_args = (
     "Dave Rolsky <autarch\@urth.org>"
   ],
   "dist_name" => "Type",
-  "dist_version" => "0.01",
+  "dist_version" => "0.02",
   "license" => "artistic_2",
   "module_name" => "Type",
   "recommends" => {},
@@ -40,7 +42,6 @@ my %module_build_args = (
     "List::MoreUtils" => 0,
     "Moose" => 0,
     "Moose::Role" => 0,
-    "MooseX::Aliases" => 0,
     "MooseX::Clone" => 0,
     "MooseX::Params::Validate" => 0,
     "Params::Util" => 0,

@@ -6,6 +6,15 @@ MANIFEST
 META.json
 META.yml
 README
+_build/auto_features
+_build/build_params
+_build/cleanup
+_build/config_data
+_build/features
+_build/magicnum
+_build/notes
+_build/prereqs
+_build/runtime_params
 c/ppport.h
 dist.ini
 inc/MyModuleBuild.pm
@@ -23,6 +32,7 @@ lib/Type/Constraint/Role/Interface.pm
 lib/Type/Constraint/Role/IsaType.pm
 lib/Type/Constraint/Simple.pm
 lib/Type/Declare.pm
+lib/Type/DeclaredAt.pm
 lib/Type/Exception.pm
 lib/Type/Exporter.pm
 lib/Type/Helpers.pm
@@ -38,6 +48,7 @@ t/combines.t
 t/conflicts.t
 t/declare-helpers.t
 t/exception.t
+t/inline-environment.t
 t/lib/Type/Library/Combines.pm
 t/lib/Type/Library/Conflict.pm
 t/lib/Type/Library/XY.pm
@@ -46,6 +57,8 @@ t/parameterized.t
 t/release-cpan-changes.t
 t/release-no-tabs.t
 t/release-pod-coverage.t
+t/release-pod-linkcheck.t
+t/release-pod-no404s.t
 t/release-pod-spell.t
 t/release-pod-syntax.t
 t/t-clean.t

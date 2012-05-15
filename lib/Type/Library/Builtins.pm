@@ -1,6 +1,6 @@
 package Type::Library::Builtins;
 {
-  $Type::Library::Builtins::VERSION = '0.01'; # TRIAL
+  $Type::Library::Builtins::VERSION = '0.02'; # TRIAL
 }
 
 use strict;
@@ -377,3 +377,42 @@ declare(
 );
 
 1;
+
+# ABSTRACT: Implements type constraint objects for Perl's built-in types
+
+
+
+=pod
+
+=head1 NAME
+
+Type::Library::Builtins - Implements type constraint objects for Perl's built-in types
+
+=head1 VERSION
+
+version 0.02
+
+=head1 DESCRIPTION
+
+See the documentation in L<Type> for a list of types that this library
+implements.
+
+This library uses L<Type::Exporter> to export its types.
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Dave Rolsky.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
+
+
+__END__
+

@@ -1,6 +1,6 @@
 package Type::Constraint::Parameterizable;
 {
-  $Type::Constraint::Parameterizable::VERSION = '0.01'; # TRIAL
+  $Type::Constraint::Parameterizable::VERSION = '0.02'; # TRIAL
 }
 
 use strict;
@@ -9,21 +9,23 @@ use namespace::autoclean;
 
 use MooseX::Params::Validate qw( validated_list );
 use Type::Constraint::Parameterized;
-use Type::Helpers qw( _declared_at );
+use Type::DeclaredAt;
 
 use Moose;
 
 with 'Type::Constraint::Role::Interface';
 
-has parameterized_constraint_generator => (
+has _parameterized_constraint_generator => (
     is        => 'ro',
     isa       => 'CodeRef',
+    init_arg  => 'parameterized_constraint_generator',
     predicate => '_has_parameterized_constraint_generator',
 );
 
-has parameterized_inline_generator => (
+has _parameterized_inline_generator => (
     is        => 'ro',
     isa       => 'CodeRef',
+    init_arg  => 'parameterized_inline_generator',
     predicate => '_has_parameterized_inline_generator',
 );
 
@@ -51,10 +53,14 @@ sub parameterize {
         \@_,
         of          => { does => 'Type::Constraint::Role::Interface' },
         declared_at => {
-            isa     => 'HashRef[Maybe[Str]]',
-            default => _declared_at(1),
+            isa      => 'Type::DeclaredAt',
+            optional => 1,
         },
     );
+
+    # This isn't a default so as to avoid generating it even when they
+    # parameter is already set.
+    $declared_at //= Type::DeclaredAt->new_from_caller(1),
 
     my %p = (
         parent      => $self,
@@ -64,10 +70,10 @@ sub parameterize {
 
     if ( $self->_has_parameterized_constraint_generator() ) {
         $p{constraint}
-            = $self->parameterized_constraint_generator()->($parameter);
+            = $self->_parameterized_constraint_generator()->($parameter);
     }
     else {
-        my $ig = $self->parameterized_inline_generator();
+        my $ig = $self->_parameterized_inline_generator();
         $p{inline_generator} = sub { $ig->( shift, $parameter, @_ ) };
     }
 
@@ -77,3 +83,96 @@ sub parameterize {
 __PACKAGE__->meta()->make_immutable();
 
 1;
+
+# ABSTRACT: A class which represents parameterizable constraints
+
+
+
+=pod
+
+=head1 NAME
+
+Type::Constraint::Parameterizable - A class which represents parameterizable constraints
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+  my $arrayref = t('ArrayRef');
+
+  my $arrayref_of_int = $arrayref->parameterize( of => t('Int') );
+
+=head1 DESCRIPTION
+
+This class implements the API for parameterizable types like C<ArrayRef> and
+C<Maybe>.
+
+=head1 API
+
+This class implements the same API as L<Type::Constraint::Simple>, with a few
+additions.
+
+=head2 Type::Constraint::Parameterizable->new(...)
+
+This class's constructor accepts two additional parameters:
+
+=over 4
+
+=item * parameterized_constraint_generator
+
+This is a subroutine that generates a new constraint subroutine when the type
+is parameterized.
+
+It will be called as a method on the type and will be passed a single
+argument, the type object for the type parameter.
+
+This parameter is mutually exclusive with the
+C<parameterized_inline_generator> parameter.
+
+=item * parameterized_inline_generator
+
+This is a subroutine that generates a new inline generator subroutine when the
+type is parameterized.
+
+It will be called as a method on the L<Type::Constraint::Parameterized> object
+when that object needs to generate inline constraint. It will receive the type
+parameter as the first argument and the variable name as a string as the
+second.
+
+This probably seems fairly confusing, so looking at the examples in the
+L<Type::Library::Builtins> code may be helpful.
+
+This parameter is mutually exclusive with the
+C<parameterized_inline_generator> parameter.
+
+=back
+
+=head2 $type->parameterize(...)
+
+This method takes two arguments. The C<of> argument should be an object which
+does the L<Type::Constraint::Role::Interface> role, and is required.
+
+The other argument, C<declared_at>, is optional. If it is not given, then a
+new L<Type::DeclaredAt> object is creating using a call stack depth of 1.
+
+This method returns a new L<Type::Constraint::Parameterized> object.
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Dave Rolsky.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
+
+
+__END__
+

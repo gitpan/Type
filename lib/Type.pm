@@ -1,6 +1,6 @@
 package Type;
 {
-  $Type::VERSION = '0.01'; # TRIAL
+  $Type::VERSION = '0.02'; # TRIAL
 }
 
 use strict;
@@ -20,7 +20,7 @@ Type - Type constraints and coercions for Perl
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -255,7 +255,7 @@ L<Type::Exporter> package:
       where  => sub { $_[0] =~ /foo/i },
   );
 
-Now the L<MyApp::Type::Library> package will export a single type named
+Now the MyApp::Type::Library package will export a single type named
 C<Foo>. It I<does not> (yet) re-export the types provided by
 L<Type::Library::Builtins>.
 
@@ -271,7 +271,7 @@ ask for this explicitly:
 
   declare( 'Foo, ... );
 
-Now L<MyApp::Types::Library> exports any types it defines, as well as all the
+Now MyApp::Types::Library exports any types it defines, as well as all the
 types defined in L<Type::Library::Builtins>.
 
 =head1 DECLARING TYPES
@@ -345,6 +345,15 @@ Moose has some bizarre (and mostly) undocumented features relating to
 coercions and parameterizable types. This is a misfeature.
 
 =back
+
+=head1 LONG-TERM PLANS
+
+Eventually I'd like to see this distro replace Moose's internal type system,
+which would also make MooseX::Types obsolete. This almost certainly means
+rewriting this distro to not use Moose itself (or any modules which use Moose,
+like Throwable).
+
+For now, the current code is a proof of concept for the design.
 
 =head1 BUGS
 

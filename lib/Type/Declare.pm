@@ -1,6 +1,6 @@
 package Type::Declare;
 {
-  $Type::Declare::VERSION = '0.01'; # TRIAL
+  $Type::Declare::VERSION = '0.02'; # TRIAL
 }
 
 use strict;
@@ -12,7 +12,8 @@ use Carp qw( croak );
 use Params::Util qw( _CODELIKE );
 use Type::Coercion;
 use Type::Constraint::Simple;
-use Type::Helpers qw( install_t_sub _INSTANCEDOES _STRINGLIKE _declared_at );
+use Type::DeclaredAt;
+use Type::Helpers qw( install_t_sub _INSTANCEDOES _STRINGLIKE );
 use Type::Registry qw( internal_types_for_package register );
 
 our @EXPORT = qw(
@@ -159,7 +160,7 @@ sub _make_tc {
 
     return $class->new(
         %p,
-        declared_at => _declared_at(),
+        declared_at => Type::DeclaredAt->new_from_caller(2),
     );
 }
 
@@ -169,7 +170,7 @@ sub coerce {
     return $to->add_coercion(
         Type::Coercion->new(
             to          => $to, @_,
-            declared_at => _declared_at(),
+            declared_at => Type::DeclaredAt->new_from_caller(1),
         )
     );
 }
@@ -188,7 +189,7 @@ Type::Declare - Type declaration subroutines
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -203,6 +204,11 @@ version 0.01
       'Foo',
       parent => t('Str'),
       where  => sub { $_[0] =~ /foo/i },
+  );
+
+  declare(
+      'ArrayRefOfInt',
+      parent => t( 'ArrayRef', of => t('Int') ),
   );
 
   my $even = anon(
@@ -296,10 +302,22 @@ argument is a I<string> containing the variable name to use in the generated
 code. Typically this is something like C<'$_[0]'> or C<'$value'>.
 
 The inline generator subroutine should return a I<string> of code representing
-a single term, and it I<should not> be terminated with a semi-colon. This
+a single term, and it I<should not> be terminated with a semicolon. This
 allows the inlined code to be safely included in an C<if> statement, for
 example. You can use C<do { }> blocks and ternaries to get everything into one
 term. This single term should evaluate to true or false.
+
+The inline generator is expected to include code to implement both the current
+type and all its parents. Typically, the easiest way to do this is to write a
+subroutine something like this:
+
+  sub {
+      my $self = shift;
+      my $var  = shift;
+
+      return $_[0]->parent()->inline_check( $_[1] )
+          . ' and more checking code goes here';
+  }
 
 This parameter is mutually exclusive with the C<where> parameter.
 
@@ -365,12 +383,76 @@ argument is a I<string> containing the variable name to use in the generated
 code. Typically this is something like C<'$_[0]'> or C<'$value'>.
 
 The inline generator subroutine should return a I<string> of code representing
-a single term, and it I<should not> be terminated with a semi-colon. This
+a single term, and it I<should not> be terminated with a semicolon. This
 allows the inlined code to be safely included in an C<if> statement, for
 example. You can use C<do { }> blocks and ternaries to get everything into one
 term. This single term should evaluate to the new value.
 
 =back
+
+=head1 DECLARATION HELPERS
+
+This module also exports some helper subs for declaring certain kinds of types:
+
+=head2 any_isa_type(), object_isa_type()
+
+The C<any_isa_type()> helpers creates a type which accepts a class name or
+object of the given class. The C<object_isa_type()> helpers creates a type
+which only accepts an object of the given class.
+
+These subroutines take a type name as the first argument. The remaining
+arguments are key/value pairs. Currently this is just the C<class> key, which
+should be a class name. This is the class that the type requires.
+
+The type name argument can be omitted to create an anonymous type.
+
+=head2 any_can_type(), object_can_type()
+
+The C<any_can_type()> helpers creates a type which accepts a class name or
+object with the given methods. The C<object_can_type()> helpers creates a type
+which only accepts an object with the given methods.
+
+These subroutines take a type name as the first argument. The remaining
+arguments are key/value pairs. Currently this is just the C<methods> key,
+which can be either a string or array reference of strings. These strings are
+the required methods for the type.
+
+The type name argument can be omitted to create an anonymous type.
+
+=head2 enum()
+
+This creates a type which accepts a string matching a given list of acceptable
+values.
+
+The first argument is the type name. The remaining arguments are key/value
+pairs. Currently this is just the C<values> key. This should an array
+reference of acceptable string values.
+
+The type name argument can be omitted to create an anonymous type.
+
+=head1 PARAMETERIZED TYPES
+
+You can create a parameterized type by calling C<t()> with additional
+parameters, like this:
+
+  my $arrayref_of_int = t( 'ArrayRef', of => t('Int') );
+
+  my $arrayref_of_hashref_of_int = t(
+      'ArrayRef',
+      of => t(
+          'HashRef',
+          of => t('Int'),
+      ),
+  );
+
+The C<t()> subroutine assumes that if it receives more than one argument, it
+should look up the named type and call C<< $type->parameterize(...) >> with
+the additional arguments.
+
+If the named type cannot be parameterized, it throws an error.
+
+You can also call C<< $type->parameterize() >> directly if needed. See
+L<Type::Constraint::Parameterizable> for details.
 
 =head1 AUTHOR
 

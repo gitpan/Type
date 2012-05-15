@@ -1,6 +1,6 @@
 package Type::Helpers;
 {
-  $Type::Helpers::VERSION = '0.01'; # TRIAL
+  $Type::Helpers::VERSION = '0.02'; # TRIAL
 }
 
 use strict;
@@ -11,8 +11,9 @@ use Exporter 'import';
 use overload ();
 use Params::Util qw( _STRING );
 use Scalar::Util qw( blessed );
+use Type::DeclaredAt;
 
-our @EXPORT_OK = qw( install_t_sub _INSTANCEDOES _STRINGLIKE _declared_at );
+our @EXPORT_OK = qw( install_t_sub _INSTANCEDOES _STRINGLIKE );
 
 sub install_t_sub {
     my $caller = shift;
@@ -40,7 +41,7 @@ sub install_t_sub {
             unless $found->can('parameterize');
 
         return $found->parameterize(
-            declared_at => _declared_at(1),
+            declared_at => Type::DeclaredAt->new_from_caller(1),
             %p,
         );
     };
@@ -52,23 +53,6 @@ sub install_t_sub {
     }
 
     return;
-}
-
-our $_CALLER_DEPTH = 2;
-
-sub _declared_at {
-    my $depth = shift // $_CALLER_DEPTH;
-
-    my ( $package, $filename, $line ) = caller($depth);
-
-    my $sub = ( caller($depth + 1) )[3];
-
-    return {
-        package  => $package,
-        filename => $filename,
-        line     => $line,
-        sub      => $sub,
-    };
 }
 
 # XXX - this should be added to Params::Util
@@ -90,3 +74,39 @@ sub _INSTANCEDOES ($$) {
 }
 
 1;
+
+# ABSTRACT: Helper subs for the Type distro
+
+
+
+=pod
+
+=head1 NAME
+
+Type::Helpers - Helper subs for the Type distro
+
+=head1 VERSION
+
+version 0.02
+
+=head1 DESCRIPTION
+
+There's nothing public here.
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Dave Rolsky.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
+
+
+__END__
+

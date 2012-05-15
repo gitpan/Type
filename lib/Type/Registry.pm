@@ -1,6 +1,6 @@
 package Type::Registry;
 {
-  $Type::Registry::VERSION = '0.01'; # TRIAL
+  $Type::Registry::VERSION = '0.02'; # TRIAL
 }
 
 use strict;
@@ -53,3 +53,39 @@ sub internal_types_for_package {
 }
 
 1;
+
+# ABSTRACT: Implements the per-package type registry
+
+
+
+=pod
+
+=head1 NAME
+
+Type::Registry - Implements the per-package type registry
+
+=head1 VERSION
+
+version 0.02
+
+=head1 DESCRIPTION
+
+There's nothing public here.
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Dave Rolsky.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
+
+
+__END__
+

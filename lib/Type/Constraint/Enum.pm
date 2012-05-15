@@ -1,6 +1,6 @@
 package Type::Constraint::Enum;
 {
-  $Type::Constraint::Enum::VERSION = '0.01'; # TRIAL
+  $Type::Constraint::Enum::VERSION = '0.02'; # TRIAL
 }
 
 use strict;
@@ -35,17 +35,13 @@ my $_inline_generator = sub {
         . $val . ') '
         . '&& !ref('
         . $val . ') '
-        . '&& $_enum_values{'
+        . '&& $_Type_Constraint_Enum_enum_values{'
         . $val . '}';
 };
 
-has '+inline_generator' => (
+has '+_inline_generator' => (
     init_arg => undef,
     default  => sub { $_inline_generator },
-);
-
-has '+inline_environment' => (
-    default => sub { $_[0]->_build_inline_environment() },
 );
 
 sub _build_inline_environment {
@@ -53,7 +49,76 @@ sub _build_inline_environment {
 
     my %values = map { $_ => 1 } @{ $self->values() };
 
-    return { '%_enum_values' => \%values };
+    return { '%_Type_Constraint_Enum_enum_values' => \%values };
 }
 
 __PACKAGE__->meta()->make_immutable();
+
+1;
+
+# ABSTRACT: A class for constraints which require a string matching one of a set of values
+
+
+
+=pod
+
+=head1 NAME
+
+Type::Constraint::Enum - A class for constraints which require a string matching one of a set of values
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+  my $type = Type::Constraint::Enum->new(...);
+  print $_, "\n" for @{ $type->values() };
+
+=head1 DESCRIPTION
+
+This is a specialized type constraint class for types which require a string
+that matches one of a list of values.
+
+=head1 API
+
+This class provides all of the same methods as L<Type::Constraint::Simple>,
+with a few differences:
+
+=head2 Type::Constraint::Enum->new( ... )
+
+The C<parent> parameter is ignored if it passed, as it is always set to the
+C<Str> type.
+
+The C<inline_generator> and C<constraint> parameters are also ignored. This
+class provides its own default inline generator subroutine reference.
+
+Finally, this class requires an additional parameter, C<values>. This must be a
+a list of valid strings for the type.
+
+=head2 $enum->values()
+
+Returns an array reference of valid values for the type.
+
+=head1 ROLES
+
+This class does the L<Type::Constraint::Role::Interface>,
+L<Type::Role::Inlinable>, and L<MooseX::Clone> roles.
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Dave Rolsky.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
+
+
+__END__
+
