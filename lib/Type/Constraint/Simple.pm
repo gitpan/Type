@@ -1,6 +1,6 @@
 package Type::Constraint::Simple;
 {
-  $Type::Constraint::Simple::VERSION = '0.03'; # TRIAL
+  $Type::Constraint::Simple::VERSION = '0.04'; # TRIAL
 }
 
 use strict;
@@ -27,7 +27,7 @@ Type::Constraint::Simple - Class for simple (non-parameterized or specialized) t
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

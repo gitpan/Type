@@ -1,6 +1,6 @@
 package Type::Coercion;
 {
-  $Type::Coercion::VERSION = '0.03'; # TRIAL
+  $Type::Coercion::VERSION = '0.04'; # TRIAL
 }
 
 use strict;
@@ -122,7 +122,7 @@ Type::Coercion - A class representing a coercion from one type to another
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

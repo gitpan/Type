@@ -22,7 +22,7 @@ my %module_build_args = (
     "Dave Rolsky <autarch\@urth.org>"
   ],
   "dist_name" => "Type",
-  "dist_version" => "0.03",
+  "dist_version" => "0.04",
   "license" => "artistic_2",
   "module_name" => "Type",
   "recommends" => {},

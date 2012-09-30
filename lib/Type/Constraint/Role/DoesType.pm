@@ -1,6 +1,6 @@
-package Type::Constraint::Role::IsaType;
+package Type::Constraint::Role::DoesType;
 {
-  $Type::Constraint::Role::IsaType::VERSION = '0.04'; # TRIAL
+  $Type::Constraint::Role::DoesType::VERSION = '0.04'; # TRIAL
 }
 
 use strict;
@@ -11,9 +11,11 @@ use Moose::Role;
 with 'Type::Constraint::Role::Interface' =>
     { -excludes => ['_wrap_message_generator'] };
 
-has class => (
-    is       => 'ro',
-    isa      => 'ClassName',
+has role => (
+    is => 'ro',
+    # XXX - we can't use Moose's RoleName since that restricts this
+    # to only Moose roles.
+    isa      => 'Str',
     required => 1,
 );
 
@@ -21,7 +23,7 @@ sub _wrap_message_generator {
     my $self      = shift;
     my $generator = shift;
 
-    my $class = $self->class();
+    my $role = $self->role();
 
     $generator //= sub {
         my $description = shift;
@@ -30,8 +32,8 @@ sub _wrap_message_generator {
         return
               "Validation failed for $description with value "
             . Devel::PartialDump->new()->dump($value)
-            . '(not isa '
-            . $class . ')';
+            . '(does not do '
+            . $role . ')';
     };
 
     my $d = $self->_description();
@@ -41,7 +43,7 @@ sub _wrap_message_generator {
 
 1;
 
-# ABSTRACT: Provides a common implementation for Type::Constraint::AnyIsa and Type::Constraint::ObjectIsa
+# ABSTRACT: Provides a common implementation for Type::Constraint::AnyRole and Type::Constraint::ObjectRole
 
 
 
@@ -49,7 +51,7 @@ sub _wrap_message_generator {
 
 =head1 NAME
 
-Type::Constraint::Role::IsaType - Provides a common implementation for Type::Constraint::AnyIsa and Type::Constraint::ObjectIsa
+Type::Constraint::Role::DoesType - Provides a common implementation for Type::Constraint::AnyRole and Type::Constraint::ObjectRole
 
 =head1 VERSION
 
@@ -57,7 +59,8 @@ version 0.04
 
 =head1 DESCRIPTION
 
-See L<Type::Constraint::AnyIsa> and L<Type::Constraint::ObjectIsa> for details.
+See L<Type::Constraint::AnyDoes> and L<Type::Constraint::ObjectDoes> for
+details.
 
 =head1 AUTHOR
 

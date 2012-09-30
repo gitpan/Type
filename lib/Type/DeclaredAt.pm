@@ -1,6 +1,6 @@
 package Type::DeclaredAt;
 {
-  $Type::DeclaredAt::VERSION = '0.03'; # TRIAL
+  $Type::DeclaredAt::VERSION = '0.04'; # TRIAL
 }
 
 use strict;
@@ -76,7 +76,7 @@ Type::DeclaredAt - A class to represent where a type or coercion was declared
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

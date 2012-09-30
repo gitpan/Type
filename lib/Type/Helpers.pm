@@ -1,6 +1,6 @@
 package Type::Helpers;
 {
-  $Type::Helpers::VERSION = '0.03'; # TRIAL
+  $Type::Helpers::VERSION = '0.04'; # TRIAL
 }
 
 use strict;
@@ -87,7 +87,7 @@ Type::Helpers - Helper subs for the Type distro
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 

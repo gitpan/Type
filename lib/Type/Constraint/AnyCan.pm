@@ -1,6 +1,6 @@
 package Type::Constraint::AnyCan;
 {
-  $Type::Constraint::AnyCan::VERSION = '0.03'; # TRIAL
+  $Type::Constraint::AnyCan::VERSION = '0.04'; # TRIAL
 }
 
 use strict;
@@ -58,7 +58,7 @@ Type::Constraint::AnyCan - A class for constraints which require a class name or
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

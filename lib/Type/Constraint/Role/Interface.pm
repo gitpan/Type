@@ -1,6 +1,6 @@
 package Type::Constraint::Role::Interface;
 {
-  $Type::Constraint::Role::Interface::VERSION = '0.03'; # TRIAL
+  $Type::Constraint::Role::Interface::VERSION = '0.04'; # TRIAL
 }
 
 use strict;
@@ -436,7 +436,7 @@ Type::Constraint::Role::Interface - The interface all type constraints should pr
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
