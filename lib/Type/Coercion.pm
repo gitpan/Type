@@ -1,6 +1,6 @@
 package Type::Coercion;
 {
-  $Type::Coercion::VERSION = '0.02'; # TRIAL
+  $Type::Coercion::VERSION = '0.03'; # TRIAL
 }
 
 use strict;
@@ -56,6 +56,10 @@ sub BUILD {
         'A type coercion should have either a coercion or inline_generator parameter, not both'
         if $self->_has_coercion() && $self->_has_inline_generator();
 
+    die
+        'A type coercion must have either a coercion or inline_generator parameter'
+        unless $self->_has_coercion() || $self->_has_inline_generator();
+
     return;
 }
 
@@ -76,7 +80,7 @@ sub _build_optimized_coercion {
     my $self = shift;
 
     if ( $self->_has_inline_generator() ) {
-        return $self->_inlined_coercion();
+        return $self->_generated_inline_sub();
     }
     else {
         return $self->_coercion();
@@ -118,7 +122,7 @@ Type::Coercion - A class representing a coercion from one type to another
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

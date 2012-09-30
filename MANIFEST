@@ -49,6 +49,7 @@ t/conflicts.t
 t/declare-helpers.t
 t/exception.t
 t/inline-environment.t
+t/inline.t
 t/lib/Type/Library/Combines.pm
 t/lib/Type/Library/Conflict.pm
 t/lib/Type/Library/XY.pm
@@ -62,3 +63,4 @@ t/release-pod-no404s.t
 t/release-pod-spell.t
 t/release-pod-syntax.t
 t/t-clean.t
+t/with-moose.t

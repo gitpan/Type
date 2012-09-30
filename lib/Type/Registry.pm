@@ -1,6 +1,6 @@
 package Type::Registry;
 {
-  $Type::Registry::VERSION = '0.02'; # TRIAL
+  $Type::Registry::VERSION = '0.03'; # TRIAL
 }
 
 use strict;
@@ -66,7 +66,7 @@ Type::Registry - Implements the per-package type registry
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

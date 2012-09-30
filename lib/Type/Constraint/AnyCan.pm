@@ -1,6 +1,6 @@
 package Type::Constraint::AnyCan;
 {
-  $Type::Constraint::AnyCan::VERSION = '0.02'; # TRIAL
+  $Type::Constraint::AnyCan::VERSION = '0.03'; # TRIAL
 }
 
 use strict;
@@ -42,10 +42,6 @@ has '+_inline_generator' => (
     default  => sub { $_inline_generator },
 );
 
-has '+_message_generator' => (
-    default => sub { $_[0]->_default_message_generator() },
-);
-
 __PACKAGE__->meta()->make_immutable();
 
 1;
@@ -62,7 +58,7 @@ Type::Constraint::AnyCan - A class for constraints which require a class name or
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

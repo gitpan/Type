@@ -51,10 +51,10 @@ use Type::Library::Builtins;
         'coerced int to arrayref',
     );
 
-    like(
-        exception { $arrayref->coerce_value(42.1) },
-        qr/\QCould not find a coercion for 42.1/,
-        'cannot coerced num to arrayref',
+    is(
+        $arrayref->coerce_value(42.1),
+        42.1,
+        'cannot coerce num to arrayref - returns original value',
     );
 
     ok(
@@ -132,6 +132,62 @@ use Type::Library::Builtins;
         exception { $coerce_and_check->('foo') },
         qr/\QValidation failed for type named HashRef declared in package Type::Library::Builtins\E.+\Qwith value "foo"/,
         'string throws exception'
+    );
+}
+
+{
+    my $hashref = declare(
+        'HashRef2',
+        parent => t('HashRef'),
+    );
+
+    coerce(
+        $hashref,
+        from  => t('ArrayRef'),
+        using => sub {
+            return { @{ $_[0] } };
+        },
+    );
+
+    coerce(
+        $hashref,
+        from  => t('Int'),
+        using => sub {
+            return { $_[0] => 1 };
+        },
+    );
+
+    is_deeply(
+        $hashref->coerce_value( [ x => 1 ] ),
+        { x => 1 },
+        'arrayref is coerced to hashref'
+    );
+
+    is_deeply(
+        $hashref->coerce_value(42),
+        { 42 => 1 },
+        'integer is coerced to hashref'
+    );
+
+    is(
+        $hashref->coerce_value('foo'),
+        'foo',
+        'cannot coerce num to arrayref - returns original value',
+    );
+}
+
+{
+    my $str = t('Str');
+
+    like(
+        exception {
+            coerce(
+                $str,
+                from => t('Int'),
+            );
+        },
+        qr/\QA type coercion must have either a coercion or inline_generator parameter/,
+        'a coercion must have a coercion sub or an inline generator'
     );
 }
 

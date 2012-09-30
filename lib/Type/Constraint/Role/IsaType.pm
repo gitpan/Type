@@ -1,6 +1,6 @@
 package Type::Constraint::Role::IsaType;
 {
-  $Type::Constraint::Role::IsaType::VERSION = '0.02'; # TRIAL
+  $Type::Constraint::Role::IsaType::VERSION = '0.03'; # TRIAL
 }
 
 use strict;
@@ -8,7 +8,8 @@ use warnings;
 
 use Moose::Role;
 
-with 'Type::Constraint::Role::Interface';
+with 'Type::Constraint::Role::Interface' =>
+    { -excludes => ['_wrap_message_generator'] };
 
 has class => (
     is       => 'ro',
@@ -16,21 +17,27 @@ has class => (
     required => 1,
 );
 
-my $_default_message_generator = sub {
-    my $self  = shift;
-    my $thing = shift;
-    my $value = shift;
+sub _wrap_message_generator {
+    my $self      = shift;
+    my $generator = shift;
 
-    return
-          q{Validation failed for } 
-        . $thing
-        . q{ with value }
-        . Devel::PartialDump->new()->dump($value)
-        . '(not isa '
-        . $self->class() . ')';
-};
+    my $class = $self->class();
 
-sub _default_message_generator { return $_default_message_generator }
+    $generator //= sub {
+        my $description = shift;
+        my $value       = shift;
+
+        return
+              "Validation failed for $description with value "
+            . Devel::PartialDump->new()->dump($value)
+            . '(not isa '
+            . $class . ')';
+    };
+
+    my $d = $self->_description();
+
+    return sub { $generator->( $d, @_ ) };
+}
 
 1;
 
@@ -46,7 +53,7 @@ Type::Constraint::Role::IsaType - Provides a common implementation for Type::Con
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

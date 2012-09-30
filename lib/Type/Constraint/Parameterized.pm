@@ -1,6 +1,6 @@
 package Type::Constraint::Parameterized;
 {
-  $Type::Constraint::Parameterized::VERSION = '0.02'; # TRIAL
+  $Type::Constraint::Parameterized::VERSION = '0.03'; # TRIAL
 }
 
 use strict;
@@ -31,6 +31,13 @@ sub can_be_inlined {
         && $self->parameter()->can_be_inlined();
 }
 
+# Moose compatibility methods - these exist as a temporary hack to make Type
+# work with Moose.
+
+sub type_parameter {
+    shift->parameter();
+}
+
 __PACKAGE__->meta()->make_immutable();
 
 1;
@@ -47,7 +54,7 @@ Type::Constraint::Parameterized - A class which represents parameterized constra
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

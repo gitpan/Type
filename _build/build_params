@@ -49,7 +49,7 @@ do{ my $x = [
       'blib/lib',
       'blib/arch'
     ],
-    'perl' => '/home/autarch/perl5/perlbrew/perls/perl-5.14.2/bin/perl5.14.2',
+    'perl' => '/home/autarch/perl5/perlbrew/perls/perl-5.14.2/bin/perl',
     'dist_author' => undef,
     'bundle_inc' => [],
     'use_rcfile' => 1,
@@ -100,8 +100,7 @@ do{ my $x = [
     'quiet' => undef,
     'script_files' => undef,
     'extra_compiler_flags' => [
-      '-Wall',
-      '-Werror'
+      '-Wall'
     ],
     'build_script' => 'Build',
     'original_prefix' => {},

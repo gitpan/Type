@@ -1,10 +1,12 @@
 package Type;
 {
-  $Type::VERSION = '0.02'; # TRIAL
+  $Type::VERSION = '0.03'; # TRIAL
 }
 
 use strict;
 use warnings;
+
+use v5.10;
 
 1;
 
@@ -20,7 +22,7 @@ Type - Type constraints and coercions for Perl
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -324,6 +326,11 @@ requires an object, while the latter accepts a class name or object.
 In Type, the distinction between accepting an object versus object or class is
 explicit. There are four declaration helpers, C<object_can_type>,
 C<object_isa_type>, C<any_can_type>, and C<any_isa_type>.
+
+=item * Overloading support is baked in
+
+Perl's overloading is broken as hell, but ignoring it makes Moose's type
+system frustrating.
 
 =item * Types can either have a constraint or inline generator, not both
 

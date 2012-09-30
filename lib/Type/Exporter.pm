@@ -1,6 +1,6 @@
 package Type::Exporter;
 {
-  $Type::Exporter::VERSION = '0.02'; # TRIAL
+  $Type::Exporter::VERSION = '0.03'; # TRIAL
 }
 
 use strict;
@@ -42,7 +42,7 @@ Type::Exporter - Base class for type libraries
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

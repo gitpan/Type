@@ -1,6 +1,6 @@
 package Type::Library::Builtins;
 {
-  $Type::Library::Builtins::VERSION = '0.02'; # TRIAL
+  $Type::Library::Builtins::VERSION = '0.03'; # TRIAL
 }
 
 use strict;
@@ -362,7 +362,7 @@ declare(
 declare(
     'Maybe',
     type_class                     => 'Type::Constraint::Parameterizable',
-    parent                         => t('Ref'),
+    parent                         => t('Item'),
     inline                         => sub { '1' },
     parameterized_inline_generator => sub {
         my $self      = shift;
@@ -390,7 +390,7 @@ Type::Library::Builtins - Implements type constraint objects for Perl's built-in
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

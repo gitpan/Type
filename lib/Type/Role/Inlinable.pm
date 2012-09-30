@@ -1,6 +1,6 @@
 package Type::Role::Inlinable;
 {
-  $Type::Role::Inlinable::VERSION = '0.02'; # TRIAL
+  $Type::Role::Inlinable::VERSION = '0.03'; # TRIAL
 }
 
 use strict;
@@ -98,7 +98,7 @@ Type::Role::Inlinable - A role for things which can be inlined (type constraints
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

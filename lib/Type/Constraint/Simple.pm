@@ -1,6 +1,6 @@
 package Type::Constraint::Simple;
 {
-  $Type::Constraint::Simple::VERSION = '0.02'; # TRIAL
+  $Type::Constraint::Simple::VERSION = '0.03'; # TRIAL
 }
 
 use strict;
@@ -27,7 +27,7 @@ Type::Constraint::Simple - Class for simple (non-parameterized or specialized) t
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -99,6 +99,18 @@ The generator will be called as a method on the constraint with a single
 argument. That argument is the name of the variable being coerced, something
 like C<'$_[0]'> or C<'$var'>.
 
+The inline generator is expected to include code to implement both the current
+type and all its parents. Typically, the easiest way to do this is to write a
+subroutine something like this:
+
+  sub {
+      my $self = shift;
+      my $var  = shift;
+
+      return $_[0]->parent()->inline_check( $_[1] )
+          . ' and more checking code goes here';
+  }
+
 This parameter is mutually exclusive with C<constraint>.
 
 You can also pass this option with the key C<inline> in the parameter list.
@@ -117,6 +129,9 @@ It should be very rare to need to set this in the constructor. It's more
 likely that a special type subclass would need to provide values that it
 generates internally.
 
+If you do set this, you are responsible for generating variable names that
+won't clash with anything else in the inlined code.
+
 This parameter defaults to an empty hash reference.
 
 =item * message_generator => sub { ... }
@@ -130,25 +145,14 @@ with value 1.1".
 You can override this to provide something more specific about the way the
 type failed.
 
-The subroutine you provide will be called as a method on the type with two
-arguments. The first is the description of the type (the bit in the message
-above that starts with "type named Int ..." and ends with "... in sub named
-(eval)". This description says what the thing is and where it was defined.
+The subroutine you provide will be called as a subroutine, I<not as a method>,
+with two arguments. The first is the description of the type (the bit in the
+message above that starts with "type named Int ..." and ends with "... in sub
+named (eval)". This description says what the thing is and where it was
+defined.
 
 The second argument is the value that failed the type check, after any
 coercions that might have been applied.
-
-The inline generator is expected to include code to implement both the current
-type and all its parents. Typically, the easiest way to do this is to write a
-subroutine something like this:
-
-  sub {
-      my $self = shift;
-      my $var  = shift;
-
-      return $_[0]->parent()->inline_check( $_[1] )
-          . ' and more checking code goes here';
-  }
 
 You can also pass this option with the key C<message> in the parameter list.
 
@@ -169,6 +173,16 @@ Returns the value of these parameters as they were passed to the constructor.
 =head2 $type->is_anon()
 
 Returns false for named types, true otherwise.
+
+=head2 $type->is_a_type_of($other_type)
+
+Given a type object, this returns true if the type this method is called on is
+a descendant of that type or is that type.
+
+=head2 $type->is_same_type_as($other_type)
+
+Given a type object, this returns true if the type this method is called on is
+the same as that type.
 
 =head2 $type->coercions()
 
@@ -220,7 +234,7 @@ This attempts to coerce a value into a new value that matches the type. It
 checks all of the type's coercions. If it finds one which has a "from" type
 that accepts the value, it runs the coercion and returns the new value.
 
-If it cannot find a matching coercion it throws an error.
+If it cannot find a matching coercion it returns the original value.
 
 =head2 $type->inline_coercion_and_check($var)
 

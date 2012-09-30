@@ -1,6 +1,6 @@
 package Type::Constraint::Role::Interface;
 {
-  $Type::Constraint::Role::Interface::VERSION = '0.02'; # TRIAL
+  $Type::Constraint::Role::Interface::VERSION = '0.03'; # TRIAL
 }
 
 use strict;
@@ -8,12 +8,13 @@ use warnings;
 use namespace::autoclean;
 
 use Devel::PartialDump;
-use List::AllUtils qw( all );
+use List::AllUtils qw( all any );
 use Sub::Name qw( subname );
 use Try::Tiny;
 use Type::Exception;
 
 use Moose::Role;
+use MooseX::SemiAffordanceAccessor;
 
 with 'MooseX::Clone', 'Type::Role::Inlinable';
 
@@ -53,23 +54,10 @@ has _ancestors => (
     builder  => '_build_ancestors',
 );
 
-my $_default_message_generator = sub {
-    my $type  = shift;
-    my $thing = shift;
-    my $value = shift;
-
-    return
-          q{Validation failed for } 
-        . $thing
-        . q{ with value }
-        . Devel::PartialDump->new()->dump($value);
-};
-
 has _message_generator => (
-    is       => 'ro',
+    is       => 'rw',
     isa      => 'CodeRef',
-    default  => sub { $_default_message_generator },
-    init_arg => 'message_generator',
+    init_arg => undef,
 );
 
 has _coercions => (
@@ -82,6 +70,17 @@ has _coercions => (
         has_coercions           => 'count',
     },
     default => sub { {} },
+);
+
+# Because types are cloned on import, we can't directly compare type
+# objects. Because type names can be reused between packages (no global
+# registry) we can't compare types based on name either.
+has _signature => (
+    is        => 'ro',
+    isa       => 'Str',
+    init_arg => undef,
+    lazy     => 1,
+    builder  => '_build_signature',
 );
 
 my $NullConstraint = sub { 1 };
@@ -103,6 +102,7 @@ sub BUILD { }
 around BUILD => sub {
     my $orig = shift;
     my $self = shift;
+    my $p    = shift;
 
     unless ( $self->_has_constraint() || $self->_has_inline_generator() ) {
         $self->_set_constraint($NullConstraint);
@@ -112,8 +112,28 @@ around BUILD => sub {
         'A type constraint should have either a constraint or inline_generator parameter, not both'
         if $self->_has_constraint() && $self->_has_inline_generator();
 
+    $self->_set_message_generator(
+        $self->_wrap_message_generator( $p->{message_generator} ) );
+
     return;
 };
+
+sub _wrap_message_generator {
+    my $self      = shift;
+    my $generator = shift;
+
+    $generator //= sub {
+        my $description = shift;
+        my $value       = shift;
+
+        return "Validation failed for $description with value "
+            . Devel::PartialDump->new()->dump($value);
+    };
+
+    my $d = $self->_description();
+
+    return sub { $generator->( $d, @_ ) };
+}
 
 sub validate_or_die {
     my $self  = shift;
@@ -122,10 +142,9 @@ sub validate_or_die {
     return if $self->value_is_valid($value);
 
     Type::Exception->throw(
-        message => $self->_message_generator()
-            ->( $self, $self->_description(), $value ),
-        type  => $self,
-        value => $value,
+        message => $self->_message_generator()->($value),
+        type    => $self,
+        value   => $value,
     );
 }
 
@@ -140,6 +159,21 @@ sub _ancestors_and_self {
     my $self = shift;
 
     return ( ( reverse @{ $self->_ancestors() } ), $self );
+}
+
+sub is_a_type_of {
+    my $self = shift;
+    my $type = shift;
+
+    return any { $_->_signature() eq $type->_signature() }
+    $self->_ancestors_and_self();
+}
+
+sub is_same_type_as {
+    my $self = shift;
+    my $type = shift;
+
+    return $self->_signature() eq $type->_signature();
 }
 
 sub is_anon {
@@ -242,8 +276,7 @@ sub coerce_value {
         return $coercion->coerce($value);
     }
 
-    die 'Could not find a coercion for '
-        . Devel::PartialDump->new()->dump($value);
+    return $value;
 }
 
 sub can_inline_coercion_and_check {
@@ -252,43 +285,49 @@ sub can_inline_coercion_and_check {
     return all { $_->can_be_inlined() } $self, $self->coercions();
 }
 
-sub inline_coercion_and_check {
-    my $self = shift;
+{
+    my $counter = 1;
 
-    die 'Cannot inline coercion and check'
-        unless $self->can_inline_coercion_and_check();
+    sub inline_coercion_and_check {
+        my $self = shift;
 
-    my %env = (
-        '$_Type_Constraint_Interface_type' => \$self,
-        '$_Type_Constraint_Interface_message_generator' =>
-            \( $self->_message_generator() ),
-        '$_Type_Constraint_Interface_description' =>
-            \( $self->_description() ),
-        %{ $self->_inline_environment() },
-    );
+        die 'Cannot inline coercion and check'
+            unless $self->can_inline_coercion_and_check();
 
-    my $source = 'do {' . 'my $value = ' . $_[0] . ';';
-    for my $coercion ( $self->coercions() ) {
+        my $unique_id = sprintf( '%016d', $counter++ );
+
+        my $type_var_name = '$_Type_Constraint_Interface_type' . $counter;
+        my $message_generator_var_name
+            = '$_Type_Constraint_Interface_message_generator' . $counter;
+
+        my %env = (
+            $type_var_name              => \$self,
+            $message_generator_var_name => \( $self->_message_generator() ),
+            %{ $self->_inline_environment() },
+        );
+
+        my $source = 'do {' . 'my $value = ' . $_[0] . ';';
+        for my $coercion ( $self->coercions() ) {
+            $source
+                .= '$value = '
+                . $coercion->inline_coercion( $_[0] ) . ' if '
+                . $coercion->from()->inline_check( $_[0] ) . ';';
+
+            %env = ( %env, %{ $coercion->_inline_environment() } );
+        }
+
+        #<<<
         $source
-            .= '$value = '
-            . $coercion->inline_coercion( $_[0] ) . ' if '
-            . $coercion->from()->inline_check( $_[0] ) . ';';
+            .= $self->inline_check('$value')
+                . ' or Type::Exception->throw( '
+                . ' message => ' . $message_generator_var_name . '->($value),'
+                . ' type    => ' . $type_var_name . ','
+                . ' value   => $value );';
+        #>>>
+        $source .= '$value };';
 
-        %env = ( %env, %{ $coercion->_inline_environment() } );
+        return ( $source, \%env );
     }
-
-    #<<<
-    $source
-        .= $self->inline_check('$value')
-        . ' or Type::Exception->throw( '
-            . ' message => $_Type_Constraint_Interface_message_generator->('
-                . '   $_Type_Constraint_Interface_type, $_Type_Constraint_Interface_description, $value ), '
-            . ' type    => $_Type_Constraint_Interface_type,'
-            . ' value   => $value );';
-    #>>>
-    $source .= '$value };';
-
-    return ( $source, \%env );
 }
 
 sub _build_ancestors {
@@ -316,6 +355,73 @@ sub _build_description {
     return $desc;
 }
 
+sub _build_signature {
+    my $self = shift;
+
+    # This assumes that when a type is cloned, the underlying constraint or
+    # generator sub is copied by _reference_, so it has the same memory
+    # address and stringifies to the same value. XXX - will this break under
+    # threads?
+    return join "\n",
+        ( $self->_has_parent() ? $self->parent()->_signature() : () ),
+        . ( $self->_constraint() // $self->_inline_generator() );
+}
+
+# Moose compatibility methods - these exist as a temporary hack to make Type
+# work with Moose.
+
+sub has_coercion {
+    shift->has_coercions();
+}
+
+sub _inline_check {
+    shift->inline_check(@_);
+}
+
+sub _compiled_type_constraint {
+    shift->_optimized_constraint();
+}
+
+# This class implements the methods that Moose expects from coercions as well.
+sub coercion {
+    return shift;
+}
+
+sub _compiled_type_coercion {
+    my $self = shift;
+
+    return sub {
+        return $self->coerce_value(shift);
+    }
+}
+
+sub inline_environment {
+    shift->_inline_environment();
+}
+
+sub has_message {
+    1;
+}
+
+sub message {
+    shift->_message_generator();
+}
+
+sub get_message {
+    my $self  = shift;
+    my $value = shift;
+
+    return $self->_message_generator()->( $self, $value );
+}
+
+sub check {
+    shift->value_is_valid(@_);
+}
+
+sub coerce {
+    shift->coerce_value(@_);
+}
+
 1;
 
 # ABSTRACT: The interface all type constraints should provide
@@ -330,7 +436,7 @@ Type::Constraint::Role::Interface - The interface all type constraints should pr
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 package Type::Constraint::Enum;
 {
-  $Type::Constraint::Enum::VERSION = '0.02'; # TRIAL
+  $Type::Constraint::Enum::VERSION = '0.03'; # TRIAL
 }
 
 use strict;
@@ -68,7 +68,7 @@ Type::Constraint::Enum - A class for constraints which require a string matching
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
