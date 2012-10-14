@@ -1,6 +1,6 @@
 package Type::Constraint::Role::DoesType;
 {
-  $Type::Constraint::Role::DoesType::VERSION = '0.04'; # TRIAL
+  $Type::Constraint::Role::DoesType::VERSION = '0.05'; # TRIAL
 }
 
 use strict;
@@ -43,7 +43,7 @@ sub _wrap_message_generator {
 
 1;
 
-# ABSTRACT: Provides a common implementation for Type::Constraint::AnyRole and Type::Constraint::ObjectRole
+# ABSTRACT: Provides a common implementation for Type::Constraint::AnyDoes and Type::Constraint::ObjectDoes
 
 
 
@@ -51,11 +51,11 @@ sub _wrap_message_generator {
 
 =head1 NAME
 
-Type::Constraint::Role::DoesType - Provides a common implementation for Type::Constraint::AnyRole and Type::Constraint::ObjectRole
+Type::Constraint::Role::DoesType - Provides a common implementation for Type::Constraint::AnyDoes and Type::Constraint::ObjectDoes
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

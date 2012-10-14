@@ -1,6 +1,6 @@
 package Type::Constraint::Parameterized;
 {
-  $Type::Constraint::Parameterized::VERSION = '0.04'; # TRIAL
+  $Type::Constraint::Parameterized::VERSION = '0.05'; # TRIAL
 }
 
 use strict;
@@ -54,7 +54,7 @@ Type::Constraint::Parameterized - A class which represents parameterized constra
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

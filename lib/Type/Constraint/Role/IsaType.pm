@@ -1,6 +1,6 @@
 package Type::Constraint::Role::IsaType;
 {
-  $Type::Constraint::Role::IsaType::VERSION = '0.04'; # TRIAL
+  $Type::Constraint::Role::IsaType::VERSION = '0.05'; # TRIAL
 }
 
 use strict;
@@ -53,7 +53,7 @@ Type::Constraint::Role::IsaType - Provides a common implementation for Type::Con
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

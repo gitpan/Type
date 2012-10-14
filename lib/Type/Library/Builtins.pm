@@ -1,6 +1,6 @@
 package Type::Library::Builtins;
 {
-  $Type::Library::Builtins::VERSION = '0.04'; # TRIAL
+  $Type::Library::Builtins::VERSION = '0.05'; # TRIAL
 }
 
 use strict;
@@ -11,16 +11,10 @@ use parent 'Type::Exporter';
 use Class::Load qw( is_class_loaded );
 use List::MoreUtils ();
 use overload        ();
+use re qw( is_regexp );
 use Scalar::Util    ();
 use Type::Constraint::Parameterizable;
 use Type::Declare;
-
-XSLoader::load(
-    __PACKAGE__,
-    exists $Type::Library::Builtins::{VERSION}
-    ? ${ $Type::Library::Builtins::{VERSION} }
-    : ()
-);
 
 declare(
     'Any',
@@ -177,7 +171,7 @@ declare(
             . ') && defined overload::Method('
             . $_[1]
             . ', "qr") ) || '
-            . 'Type::Library::Builtins::_RegexpRef('
+            . 're::is_regexp('
             . $_[1] . ')';
     },
 );
@@ -390,7 +384,7 @@ Type::Library::Builtins - Implements type constraint objects for Perl's built-in
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

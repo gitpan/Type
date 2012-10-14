@@ -1,6 +1,6 @@
 package Type::Declare;
 {
-  $Type::Declare::VERSION = '0.04'; # TRIAL
+  $Type::Declare::VERSION = '0.05'; # TRIAL
 }
 
 use strict;
@@ -225,7 +225,7 @@ Type::Declare - Type declaration subroutines
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

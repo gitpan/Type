@@ -1,6 +1,6 @@
 package Type;
 {
-  $Type::VERSION = '0.04'; # TRIAL
+  $Type::VERSION = '0.05'; # TRIAL
 }
 
 use strict;
@@ -22,7 +22,7 @@ Type - Type constraints and coercions for Perl
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

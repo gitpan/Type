@@ -1,6 +1,6 @@
 package Type::Constraint::ObjectCan;
 {
-  $Type::Constraint::ObjectCan::VERSION = '0.04'; # TRIAL
+  $Type::Constraint::ObjectCan::VERSION = '0.05'; # TRIAL
 }
 
 use strict;
@@ -55,7 +55,7 @@ Type::Constraint::ObjectCan - A class for constraints which require an object wi
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

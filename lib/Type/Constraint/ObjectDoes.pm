@@ -1,6 +1,6 @@
 package Type::Constraint::ObjectDoes;
 {
-  $Type::Constraint::ObjectDoes::VERSION = '0.04'; # TRIAL
+  $Type::Constraint::ObjectDoes::VERSION = '0.05'; # TRIAL
 }
 
 use strict;
@@ -57,7 +57,7 @@ Type::Constraint::ObjectDoes - A class for constraints which require an object t
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

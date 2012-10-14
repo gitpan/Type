@@ -1,6 +1,6 @@
 package Type::Constraint::AnyDoes;
 {
-  $Type::Constraint::AnyDoes::VERSION = '0.04'; # TRIAL
+  $Type::Constraint::AnyDoes::VERSION = '0.05'; # TRIAL
 }
 
 use strict;
@@ -59,7 +59,7 @@ Type::Constraint::AnyDoes - A class for constraints which require a class name o
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

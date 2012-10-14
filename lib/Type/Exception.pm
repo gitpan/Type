@@ -1,6 +1,6 @@
 package Type::Exception;
 {
-  $Type::Exception::VERSION = '0.04'; # TRIAL
+  $Type::Exception::VERSION = '0.05'; # TRIAL
 }
 
 use strict;
@@ -40,7 +40,7 @@ Type::Exception - A Throwable::Error subclass for type constraint failures
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

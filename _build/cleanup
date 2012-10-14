@@ -1,8 +1,0 @@
-do{ my $x = {
-  'blib/arch/auto/Type/Library/Builtins/Builtins.bs' => 1,
-  'lib/Type/Library/Builtins.o' => 1,
-  'blib/arch/auto/Type/Library/Builtins/Builtins.so' => 1,
-  'lib/Type/Library/Builtins.c' => 1,
-  'blib' => 1
-};
-$x; }

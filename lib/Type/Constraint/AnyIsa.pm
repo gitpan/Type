@@ -1,6 +1,6 @@
 package Type::Constraint::AnyIsa;
 {
-  $Type::Constraint::AnyIsa::VERSION = '0.04'; # TRIAL
+  $Type::Constraint::AnyIsa::VERSION = '0.05'; # TRIAL
 }
 
 use strict;
@@ -57,7 +57,7 @@ Type::Constraint::AnyIsa - A class for constraints which require a class name or
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
